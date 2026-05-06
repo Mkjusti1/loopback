@@ -36,11 +36,6 @@ export default async function CyclePage({
     .select('*, profiles(*)')
     .eq('cycle_id', cycleId);
 
-  const { data: members } = await supabase
-    .from('org_members')
-    .select('*, profiles(*)')
-    .eq('org_id', orgId);
-
   const canManage = ['owner', 'admin', 'manager'].includes(membership.role);
 
   return (
@@ -66,7 +61,6 @@ export default async function CyclePage({
       </nav>
 
       <main className='max-w-4xl mx-auto px-6 py-10 space-y-10'>
-        {/* Cycle status management */}
         {canManage && (
           <section className='bg-white border border-gray-200 rounded-xl p-6 flex items-center justify-between'>
             <div>
@@ -96,7 +90,6 @@ export default async function CyclePage({
           </section>
         )}
 
-        {/* Review requests */}
         <section>
           <div className='flex items-center justify-between mb-4'>
             <h2 className='text-lg font-semibold text-gray-900'>
@@ -155,6 +148,12 @@ export default async function CyclePage({
                         Give feedback
                       </a>
                     )}
+                    <a
+                      href={`/dashboard/org/${orgId}/cycles/${cycleId}/requests/${r.id}/results`}
+                      className='text-xs text-gray-500 underline hover:no-underline'
+                    >
+                      View results
+                    </a>
                   </div>
                 </div>
               ))}
@@ -167,6 +166,37 @@ export default async function CyclePage({
             </div>
           )}
         </section>
+        {/* My review — visible to the reviewee */}
+        {requests?.some((r: any) => r.reviewee_id === user.id) && (
+          <section>
+            <h2 className='text-lg font-semibold text-gray-900 mb-4'>
+              My review
+            </h2>
+            {requests
+              .filter((r: any) => r.reviewee_id === user.id)
+              .map((r: any) => (
+                <div
+                  key={r.id}
+                  className='bg-white border border-gray-200 rounded-xl p-6 flex items-center justify-between'
+                >
+                  <div>
+                    <p className='font-medium text-gray-900'>
+                      Your feedback results
+                    </p>
+                    <p className='text-sm text-gray-500 mt-0.5 capitalize'>
+                      {r.status}
+                    </p>
+                  </div>
+                  <a
+                    href={`/dashboard/org/${orgId}/cycles/${cycleId}/requests/${r.id}/results`}
+                    className='bg-black text-white text-sm px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors'
+                  >
+                    View my feedback
+                  </a>
+                </div>
+              ))}
+          </section>
+        )}
       </main>
     </div>
   );
