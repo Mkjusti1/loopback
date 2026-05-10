@@ -176,9 +176,11 @@ export default async function CyclePage({
                         Give feedback
                       </a>
                     )}
-                    <a href={`/dashboard/org/${orgId}/cycles/${cycleId}/requests/${r.id}/results`} style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', textDecoration: 'underline' }}>
-                      View results
-                    </a>
+                    {canManage && (
+                      <a href={`/dashboard/org/${orgId}/cycles/${cycleId}/requests/${r.id}/results`} style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', textDecoration: 'underline' }}>
+                        View results
+                      </a>
+                    )}
                   </div>
                 </div>
               ))}
