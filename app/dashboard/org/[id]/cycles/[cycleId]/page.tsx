@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 
 export default async function CyclePage({
@@ -8,6 +9,7 @@ export default async function CyclePage({
 }) {
   const { id: orgId, cycleId } = await params;
   const supabase = await createClient();
+  const admin = createAdminClient();
 
   const {
     data: { user },
@@ -31,7 +33,7 @@ export default async function CyclePage({
 
   if (!cycle) redirect(`/dashboard/org/${orgId}`);
 
-  const { data: requests } = await supabase
+  const { data: requests } = await admin
     .from('review_requests')
     .select('*, profiles(*)')
     .eq('cycle_id', cycleId);
@@ -166,7 +168,7 @@ export default async function CyclePage({
             </div>
           )}
         </section>
-        {/* My review — visible to the reviewee */}
+
         {requests?.some((r: any) => r.reviewee_id === user.id) && (
           <section>
             <h2 className='text-lg font-semibold text-gray-900 mb-4'>
