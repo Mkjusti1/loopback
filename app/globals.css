@@ -1,26 +1,42 @@
-@import "tailwindcss";
+@import "@fontsource/plus-jakarta-sans/400.css";
+@import "@fontsource/plus-jakarta-sans/500.css";
+@import "@fontsource/plus-jakarta-sans/600.css";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: #011C40;
+  --surface: #26658C;
+  --border: #1a4a6e;
+  --text-primary: #ffffff;
+  --text-secondary: #c8dff0;
+  --text-hint: #8ab4cc;
+  --accent: #f97316;
+  --accent-hover: #ea6c0a;
+  --accent-light: #fff7ed;
+  --success: #4ade80;
+  --success-light: #052e16;
+  --danger: #f87171;
+  --danger-light: #1f0707;
+  --info-light: #0c2544;
+  --info: #60a5fa;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background-color: var(--bg);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--surface);
+  color: white;
 }

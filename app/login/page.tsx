@@ -1,110 +1,201 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { createClient } from '@/lib/supabase/client';
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
 
 export default function LoginPage() {
-  const router = useRouter();
-  const supabase = createClient();
+  const router = useRouter()
+  const supabase = createClient()
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [mode, setMode] = useState<'login' | 'signup'>('login');
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [mode, setMode] = useState<'login' | 'signup'>('login')
 
   async function handleSubmit() {
-    setLoading(true);
-    setError('');
+    setLoading(true)
+    setError('')
 
     if (mode === 'login') {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-      if (error) setError(error.message);
-      else router.push('/dashboard');
+      const { error } = await supabase.auth.signInWithPassword({ email, password })
+      if (error) setError(error.message)
+      else router.push('/dashboard')
     } else {
       const { error } = await supabase.auth.signUp({
         email,
         password,
-        options: { data: { full_name: '' } },
-      });
-      if (error) setError(error.message);
-      else setError('Check your email to confirm your account.');
+        options: { data: { full_name: '' } }
+      })
+      if (error) setError(error.message)
+      else setError('Check your email to confirm your account.')
     }
 
-    setLoading(false);
+    setLoading(false)
   }
 
   return (
-    <div className='min-h-screen bg-gray-50 flex items-center justify-center px-4'>
-      <div className='bg-white rounded-2xl shadow-sm border border-gray-200 w-full max-w-md p-8'>
-        <div className='mb-8'>
-          <h1 className='text-2xl font-semibold text-gray-900'>Loopback</h1>
-          <p className='text-gray-500 text-sm mt-1'>
-            {mode === 'login'
-              ? 'Sign in to your workspace'
-              : 'Create your account'}
+    <div style={{
+      minHeight: '100vh',
+      background: 'var(--bg)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '1.5rem'
+    }}>
+      <div style={{ width: '100%', maxWidth: '420px' }}>
+
+        {/* Logo */}
+        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+          <div style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '48px',
+            height: '48px',
+            background: 'var(--accent)',
+            borderRadius: '14px',
+            marginBottom: '1rem'
+          }}>
+            <span style={{ color: 'white', fontSize: '22px' }}>↺</span>
+          </div>
+          <h1 style={{ fontSize: '1.5rem', fontWeight: '600', color: 'var(--text-primary)' }}>
+            Loopback
+          </h1>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginTop: '0.25rem' }}>
+            {mode === 'login' ? 'Welcome back' : 'Create your account'}
           </p>
         </div>
 
-        <div className='space-y-4'>
-          <div>
-            <label className='block text-sm font-medium text-gray-700 mb-1'>
-              Email
-            </label>
-            <input
-              type='email'
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className='w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black'
-              placeholder='you@company.com'
-            />
+        {/* Card */}
+        <div style={{
+          background: 'var(--surface)',
+          border: '1px solid var(--border)',
+          borderRadius: '20px',
+          padding: '2rem',
+          boxShadow: '0 1px 4px rgba(0,0,0,0.06)'
+        }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+
+            <div>
+              <label style={{
+                display: 'block',
+                fontSize: '0.8125rem',
+                fontWeight: '500',
+                color: 'var(--text-primary)',
+                marginBottom: '0.375rem'
+              }}>
+                Email
+              </label>
+              <input
+                type="email"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                placeholder="you@company.com"
+                style={{
+                  width: '100%',
+                  border: '1px solid var(--border)',
+                  borderRadius: '10px',
+                  padding: '0.625rem 0.875rem',
+                  fontSize: '0.875rem',
+                  outline: 'none',
+                  background: 'var(--bg)',
+                  color: 'var(--text-primary)',
+                  fontFamily: 'inherit'
+                }}
+              />
+            </div>
+
+            <div>
+              <label style={{
+                display: 'block',
+                fontSize: '0.8125rem',
+                fontWeight: '500',
+                color: 'var(--text-primary)',
+                marginBottom: '0.375rem'
+              }}>
+                Password
+              </label>
+              <input
+                type="password"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && handleSubmit()}
+                placeholder="••••••••"
+                style={{
+                  width: '100%',
+                  border: '1px solid var(--border)',
+                  borderRadius: '10px',
+                  padding: '0.625rem 0.875rem',
+                  fontSize: '0.875rem',
+                  outline: 'none',
+                  background: 'var(--bg)',
+                  color: 'var(--text-primary)',
+                  fontFamily: 'inherit'
+                }}
+              />
+            </div>
+
+            {error && (
+              <p style={{
+                fontSize: '0.8125rem',
+                color: error.includes('Check') ? 'var(--success)' : 'var(--danger)',
+                background: error.includes('Check') ? 'var(--success-light)' : 'var(--danger-light)',
+                padding: '0.625rem 0.875rem',
+                borderRadius: '8px'
+              }}>
+                {error}
+              </p>
+            )}
+
+            <button
+              onClick={handleSubmit}
+              disabled={loading}
+              style={{
+                width: '100%',
+                background: loading ? 'var(--text-hint)' : 'var(--accent)',
+                color: 'white',
+                border: 'none',
+                borderRadius: '10px',
+                padding: '0.75rem',
+                fontSize: '0.875rem',
+                fontWeight: '600',
+                cursor: loading ? 'not-allowed' : 'pointer',
+                fontFamily: 'inherit',
+                transition: 'background 0.15s'
+              }}
+            >
+              {loading ? 'Please wait...' : mode === 'login' ? 'Sign in' : 'Create account'}
+            </button>
+
           </div>
-
-          <div>
-            <label className='block text-sm font-medium text-gray-700 mb-1'>
-              Password
-            </label>
-            <input
-              type='password'
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
-              className='w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black'
-              placeholder='••••••••'
-            />
-          </div>
-
-          {error && <p className='text-sm text-red-500'>{error}</p>}
-
-          <button
-            onClick={handleSubmit}
-            disabled={loading}
-            className='w-full bg-black text-white rounded-lg py-2 text-sm font-medium hover:bg-gray-800 disabled:opacity-50 transition-colors'
-          >
-            {loading
-              ? 'Please wait...'
-              : mode === 'login'
-              ? 'Sign in'
-              : 'Create account'}
-          </button>
         </div>
 
-        <p className='text-sm text-gray-500 text-center mt-6'>
-          {mode === 'login'
-            ? "Don't have an account?"
-            : 'Already have an account?'}{' '}
+        <p style={{
+          textAlign: 'center',
+          fontSize: '0.8125rem',
+          color: 'var(--text-secondary)',
+          marginTop: '1.25rem'
+        }}>
+          {mode === 'login' ? "Don't have an account?" : 'Already have an account?'}{' '}
           <button
             onClick={() => setMode(mode === 'login' ? 'signup' : 'login')}
-            className='text-black font-medium hover:underline'
+            style={{
+              background: 'none',
+              border: 'none',
+              color: 'var(--accent)',
+              fontWeight: '600',
+              cursor: 'pointer',
+              fontFamily: 'inherit',
+              fontSize: '0.8125rem'
+            }}
           >
             {mode === 'login' ? 'Sign up' : 'Sign in'}
           </button>
         </p>
+
       </div>
     </div>
-  );
+  )
 }

@@ -1,101 +1,101 @@
-import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
-import { redirect } from 'next/navigation';
+import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
+import { redirect } from 'next/navigation'
 
 export default async function FeedbackResultsPage({
   params,
 }: {
-  params: Promise<{ id: string; cycleId: string; requestId: string }>;
+  params: Promise<{ id: string; cycleId: string; requestId: string }>
 }) {
-  const { id: orgId, cycleId, requestId } = await params;
-  const supabase = await createClient();
-  const admin = createAdminClient();
+  const { id: orgId, cycleId, requestId } = await params
+  const supabase = await createClient()
+  const admin = createAdminClient()
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect('/login');
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/login')
 
-  // Get the review request
   const { data: request } = await admin
     .from('review_requests')
     .select('*, profiles(*)')
     .eq('id', requestId)
-    .single();
+    .single()
 
-  if (!request) redirect(`/dashboard/org/${orgId}/cycles/${cycleId}`);
+  if (!request) redirect(`/dashboard/org/${orgId}/cycles/${cycleId}`)
 
-  // Only the reviewee or managers+ can see results
   const { data: membership } = await supabase
     .from('org_members')
     .select('role')
     .eq('org_id', orgId)
     .eq('user_id', user.id)
-    .single();
+    .single()
 
-  const isReviewee = request.reviewee_id === user.id;
-  const isManager = ['owner', 'admin', 'manager'].includes(membership?.role);
+  const isReviewee = request.reviewee_id === user.id
+  const isManager = ['owner', 'admin', 'manager'].includes(membership?.role)
 
-  if (!isReviewee && !isManager) redirect(`/dashboard/org/${orgId}`);
+  if (!isReviewee && !isManager) redirect(`/dashboard/org/${orgId}`)
 
-  // Get all feedback for this request
   const { data: feedbackList } = await admin
     .from('feedback')
     .select('*, profiles(*)')
-    .eq('request_id', requestId);
+    .eq('request_id', requestId)
 
   return (
-    <div className='min-h-screen bg-gray-50'>
-      <nav className='bg-white border-b border-gray-200 px-6 py-4'>
-        <a
-          href={`/dashboard/org/${orgId}/cycles/${cycleId}`}
-          className='text-gray-400 hover:text-gray-600 text-sm'
-        >
+    <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
+      <nav style={{
+        background: 'var(--surface)',
+        borderBottom: '1px solid var(--border)',
+        padding: '1rem 1.5rem',
+      }}>
+        <a href={`/dashboard/org/${orgId}/cycles/${cycleId}`} style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', textDecoration: 'none' }}>
           ← Back to cycle
         </a>
       </nav>
 
-      <main className='max-w-3xl mx-auto px-6 py-10'>
-        <div className='mb-8'>
-          <h1 className='text-2xl font-semibold text-gray-900'>
-            Feedback for{' '}
-            {request.profiles?.full_name || request.profiles?.email}
+      <main style={{ maxWidth: '720px', margin: '0 auto', padding: '2.5rem 1.5rem' }}>
+        <div style={{ marginBottom: '2rem' }}>
+          <h1 style={{ fontSize: '1.5rem', fontWeight: '600', color: 'var(--text-primary)' }}>
+            Feedback for {request.profiles?.full_name || request.profiles?.email}
           </h1>
-          <p className='text-gray-500 text-sm mt-1'>
-            {feedbackList?.length || 0} response
-            {feedbackList?.length !== 1 ? 's' : ''}
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginTop: '0.25rem' }}>
+            {feedbackList?.length || 0} response{feedbackList?.length !== 1 ? 's' : ''}
           </p>
         </div>
 
         {feedbackList && feedbackList.length > 0 ? (
-          <div className='space-y-4'>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             {feedbackList.map((f: any) => (
-              <div
-                key={f.id}
-                className='bg-white border border-gray-200 rounded-xl p-6'
-              >
-                <div className='flex items-center justify-between mb-3'>
-                  <span className='text-sm font-medium text-gray-700'>
-                    {f.is_anonymous
-                      ? 'Anonymous'
-                      : f.profiles?.full_name || f.profiles?.email || 'Unknown'}
+              <div key={f.id} style={{
+                background: 'var(--surface)',
+                border: '1px solid var(--border)',
+                borderRadius: '16px',
+                padding: '1.5rem',
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                  <span style={{ fontSize: '0.875rem', fontWeight: '500', color: 'var(--text-primary)' }}>
+                    {f.is_anonymous ? 'Anonymous' : f.profiles?.full_name || f.profiles?.email || 'Unknown'}
                   </span>
-                  <span className='text-xs text-gray-400'>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-hint)' }}>
                     {new Date(f.submitted_at).toLocaleDateString()}
                   </span>
                 </div>
-                <p className='text-sm text-gray-700 leading-relaxed whitespace-pre-wrap'>
+                <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', lineHeight: '1.7', whiteSpace: 'pre-wrap' }}>
                   {f.response}
                 </p>
               </div>
             ))}
           </div>
         ) : (
-          <div className='bg-white border border-gray-200 rounded-xl p-10 text-center'>
-            <p className='text-gray-500 text-sm'>No feedback submitted yet.</p>
+          <div style={{
+            background: 'var(--surface)',
+            border: '1px solid var(--border)',
+            borderRadius: '16px',
+            padding: '3rem',
+            textAlign: 'center',
+          }}>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>No feedback submitted yet.</p>
           </div>
         )}
       </main>
     </div>
-  );
+  )
 }
